@@ -1,0 +1,61 @@
+@baseUrl = http://10.46.30.164:8080/api
+@testEmail = api.test.20261108@example.com
+@testPassword = GANTI_PASSWORD_TEST_DI_SINI
+
+@productId = {{listProducts.response.body.$.items[0].id}}
+@token = {{login.response.body.$.token}}
+@userId = {{login.response.body.$.record.id}}
+@favoriteId = {{addFavorite.response.body.$.id}}
+
+### 1. Cek gateway
+GET {{baseUrl}}/health
+
+### 2. Daftar produk
+# @name listProducts
+GET {{baseUrl}}/products?perPage=5&sort=-created
+
+### 3. Cari produk dengan filter
+GET {{baseUrl}}/products?filter=title~'kopi'
+
+### 4. Detail produk pertama
+GET {{baseUrl}}/products/{{productId}}
+
+### 5. Registrasi akun
+POST {{baseUrl}}/auth/records
+Content-Type: application/json
+
+{
+  "name": "Budi API Test",
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}",
+  "passwordConfirm": "{{testPassword}}"
+}
+
+### 6. Login akun
+# @name login
+POST {{baseUrl}}/auth/auth-with-password
+Content-Type: application/json
+
+{
+  "identity": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+### 7. Tambah favorit
+# @name addFavorite
+POST {{baseUrl}}/favorites
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+  "user": "{{userId}}",
+  "product_id": "{{productId}}"
+}
+
+### 8. Lihat favorit
+GET {{baseUrl}}/favorites
+Authorization: {{token}}
+
+### 9. Hapus favorit
+DELETE {{baseUrl}}/favorites/{{favoriteId}}
+Authorization: {{token}}
